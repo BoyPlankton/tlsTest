@@ -1,9 +1,7 @@
 package main
 
 import (
-	"crypto/tls"
 	"flag"
-	"fmt"
 	"log"
 )
 
@@ -25,10 +23,11 @@ func main() {
 
 	log.Printf("Host: %v, Port: %v, Verify: %v\n", *host, *port, *verify)
 
-	tlsConn := NewTlsConn()
+	tlsConn := NewTLSConn()
 
 	tlsConn.SetHost(*host)
 	tlsConn.SetPort(*port)
+	tlsConn.SetName(*name)
 	tlsConn.SetVerify(*verify)
 
 	err := tlsConn.Dial()
@@ -37,27 +36,4 @@ func main() {
 	}
 
 	tlsConn.PrintConnectionStatus()
-
-	tlsVersions := [...]uint16{
-		tls.VersionSSL30,
-		tls.VersionTLS10,
-		tls.VersionTLS11,
-		tls.VersionTLS12,
-	}
-
-	/*
-		tlsCurves := [...]tls.CurveID{
-			tls.CurveP256,
-			tls.CurveP384,
-			tls.CurveP521,
-			tls.X25519,
-		}
-	*/
-
-	//for tlsVersion := range tlsVersions {
-	for i := 0; i < len(tlsVersions); i++ {
-		//for j := 0; j < len(tlsCurves); j++ {
-		fmt.Printf("\t%v\tStatus:%v\n", returnTlsVersion(tlsVersions[i]), testTlsConfig(*host, *port, *name, *verify, tlsVersions[i]))
-		//}
-	}
 }
