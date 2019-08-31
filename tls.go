@@ -40,11 +40,12 @@ func returnTLSCurve(curve tls.CurveID) string {
 	return "Unknown"
 }
 
-func testTLSConfig(host string, port string, name string, verify bool, tlsVersion uint16, cipherSuite uint16) bool {
+func testTLSConfig(host string, port string, name string, tlsVersion uint16, cipherSuite uint16) bool {
 	tmpCS := []uint16{cipherSuite}
 
 	conf := &tls.Config{
-		InsecureSkipVerify: verify,
+		// We're testing the configuration of the server here, not verifying the SSL certificate
+		InsecureSkipVerify: true,
 		MinVersion:         tlsVersion,
 		MaxVersion:         tlsVersion,
 		CipherSuites:       tmpCS,
@@ -230,7 +231,7 @@ func (c *TLSConn) PrintConnectionStatus() {
 		fmt.Printf("%-40s", CipherSuiteName(cipherSuite))
 
 		for _, tlsVersion := range tlsVersions {
-			fmt.Printf(" %-7v", testTLSConfig(c.host, c.port, c.name, c.verify, tlsVersion, cipherSuite))
+			fmt.Printf(" %-7v", testTLSConfig(c.host, c.port, c.name, tlsVersion, cipherSuite))
 		}
 
 		fmt.Printf("\n")
