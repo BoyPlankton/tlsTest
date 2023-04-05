@@ -114,8 +114,11 @@ func (c *TLSConn) PrintConnectionStatus() {
 		tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 		tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 		tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
-		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+		tls.TLS_AES_128_GCM_SHA256,
+		tls.TLS_AES_256_GCM_SHA384,
+		tls.TLS_CHACHA20_POLY1305_SHA256,
 		tls.TLS_FALLBACK_SCSV,
 	}
 
@@ -127,7 +130,7 @@ func (c *TLSConn) PrintConnectionStatus() {
 		}
 
 		fmt.Printf("Server Key and Certificate #%d\n", i+1)
-		fmt.Println(strings.Repeat("*", 80))
+		fmt.Println(strings.Repeat("*", 85))
 
 		PrintDetails("Subject", cert.Subject.String())
 		PrintDetails("Alternative Names", strings.Join(cert.DNSNames, ","))
@@ -158,14 +161,14 @@ func (c *TLSConn) PrintConnectionStatus() {
 	}
 
 	fmt.Printf("\nDefault Connection Details\n")
-	fmt.Println(strings.Repeat("*", 80))
+	fmt.Println(strings.Repeat("*", 85))
 	PrintDetails("Version", TLSVersionName(cs.Version))
 	PrintDetails("Cipher Suite", CipherSuiteName(cs.CipherSuite))
 
 	fmt.Printf("\nSupported TLS/SSL Versions\n")
-	fmt.Println(strings.Repeat("*", 80))
+	fmt.Println(strings.Repeat("*", 85))
 
-	fmt.Printf("%-40s", "Cipher Suite")
+	fmt.Printf("%-45s", "Cipher Suite")
 
 	for _, tlsVersion := range tlsVersions {
 		fmt.Printf(" %-7s", TLSVersionName(tlsVersion))
@@ -173,10 +176,10 @@ func (c *TLSConn) PrintConnectionStatus() {
 
 	fmt.Printf("\n")
 
-	fmt.Println(strings.Repeat("*", 80))
+	fmt.Println(strings.Repeat("*", 85))
 
 	for _, cipherSuite := range cipherSuites {
-		fmt.Printf("%-40s", CipherSuiteName(cipherSuite))
+		fmt.Printf("%-45s", CipherSuiteName(cipherSuite))
 
 		for _, tlsVersion := range tlsVersions {
 			fmt.Printf(" %-7v", TestTLSConfig(c.host, c.port, c.name, tlsVersion, cipherSuite))
@@ -251,10 +254,16 @@ func CipherSuiteName(suite uint16) string {
 		return "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
 	case tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
 		return "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
-	case tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305:
-		return "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
-	case tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305:
-		return "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305"
+	case tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:
+		return "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+	case tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
+		return "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
+	case tls.TLS_AES_128_GCM_SHA256:
+		return "TLS_AES_128_GCM_SHA256"
+	case tls.TLS_AES_256_GCM_SHA384:
+		return "TLS_AES_256_GCM_SHA384"
+	case tls.TLS_CHACHA20_POLY1305_SHA256:
+		return "TLS_CHACHA20_POLY1305_SHA256"
 	case tls.TLS_FALLBACK_SCSV:
 		return "TLS_FALLBACK_SCSV"
 	}
