@@ -10,60 +10,6 @@ import (
 	"time"
 )
 
-func returnTLSVersion(version uint16) string {
-	switch version {
-	case tls.VersionSSL30:
-		return "SSL 3.0"
-	case tls.VersionTLS10:
-		return "TLS 1.0"
-	case tls.VersionTLS11:
-		return "TLS 1.1"
-	case tls.VersionTLS12:
-		return "TLS 1.2"
-	}
-
-	return "Unknown"
-}
-
-func returnTLSCurve(curve tls.CurveID) string {
-	switch curve {
-	case tls.CurveP256:
-		return "P256"
-	case tls.CurveP384:
-		return "P384"
-	case tls.CurveP521:
-		return "P521"
-	case tls.X25519:
-		return "X25519"
-	}
-
-	return "Unknown"
-}
-
-func testTLSConfig(host string, port string, name string, tlsVersion uint16, cipherSuite uint16) bool {
-	tmpCS := []uint16{cipherSuite}
-
-	conf := &tls.Config{
-		// We're testing the configuration of the server here, not verifying the SSL certificate
-		InsecureSkipVerify: true,
-		MinVersion:         tlsVersion,
-		MaxVersion:         tlsVersion,
-		CipherSuites:       tmpCS,
-	}
-
-	if len(name) > 0 {
-		conf.ServerName = name
-	}
-
-	conn, err := tls.Dial("tcp", host+":"+port, conf)
-	if err != nil {
-		return false
-	}
-	defer conn.Close()
-
-	return true
-}
-
 // TLSConn is a struct for holding all the details
 // of a TLS connection.
 type TLSConn struct {
@@ -90,6 +36,7 @@ func NewTLSConn() TLSConn {
 		tls.VersionTLS10,
 		tls.VersionTLS11,
 		tls.VersionTLS12,
+		tls.VersionTLS13,
 	}
 
 	c.tlsCurves = []tls.CurveID{
@@ -143,6 +90,7 @@ func (c *TLSConn) PrintConnectionStatus() {
 		tls.VersionTLS10,
 		tls.VersionTLS11,
 		tls.VersionTLS12,
+		tls.VersionTLS13,
 	}
 
 	cipherSuites := [...]uint16{
@@ -166,8 +114,11 @@ func (c *TLSConn) PrintConnectionStatus() {
 		tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
 		tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 		tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
-		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+		tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+		tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+		tls.TLS_AES_128_GCM_SHA256,
+		tls.TLS_AES_256_GCM_SHA384,
+		tls.TLS_CHACHA20_POLY1305_SHA256,
 		tls.TLS_FALLBACK_SCSV,
 	}
 
@@ -179,7 +130,7 @@ func (c *TLSConn) PrintConnectionStatus() {
 		}
 
 		fmt.Printf("Server Key and Certificate #%d\n", i+1)
-		fmt.Println(strings.Repeat("*", 80))
+		fmt.Println(strings.Repeat("*", 85))
 
 		PrintDetails("Subject", cert.Subject.String())
 		PrintDetails("Alternative Names", strings.Join(cert.DNSNames, ","))
@@ -210,14 +161,14 @@ func (c *TLSConn) PrintConnectionStatus() {
 	}
 
 	fmt.Printf("\nDefault Connection Details\n")
-	fmt.Println(strings.Repeat("*", 80))
+	fmt.Println(strings.Repeat("*", 85))
 	PrintDetails("Version", TLSVersionName(cs.Version))
 	PrintDetails("Cipher Suite", CipherSuiteName(cs.CipherSuite))
 
 	fmt.Printf("\nSupported TLS/SSL Versions\n")
-	fmt.Println(strings.Repeat("*", 80))
+	fmt.Println(strings.Repeat("*", 85))
 
-	fmt.Printf("%-40s", "Cipher Suite")
+	fmt.Printf("%-45s", "Cipher Suite")
 
 	for _, tlsVersion := range tlsVersions {
 		fmt.Printf(" %-7s", TLSVersionName(tlsVersion))
@@ -225,13 +176,13 @@ func (c *TLSConn) PrintConnectionStatus() {
 
 	fmt.Printf("\n")
 
-	fmt.Println(strings.Repeat("*", 80))
+	fmt.Println(strings.Repeat("*", 85))
 
 	for _, cipherSuite := range cipherSuites {
-		fmt.Printf("%-40s", CipherSuiteName(cipherSuite))
+		fmt.Printf("%-45s", CipherSuiteName(cipherSuite))
 
 		for _, tlsVersion := range tlsVersions {
-			fmt.Printf(" %-7v", testTLSConfig(c.host, c.port, c.name, tlsVersion, cipherSuite))
+			fmt.Printf(" %-7v", TestTLSConfig(c.host, c.port, c.name, tlsVersion, cipherSuite))
 		}
 
 		fmt.Printf("\n")
@@ -303,15 +254,45 @@ func CipherSuiteName(suite uint16) string {
 		return "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
 	case tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:
 		return "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
-	case tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305:
-		return "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
-	case tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305:
-		return "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305"
+	case tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:
+		return "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+	case tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:
+		return "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
+	case tls.TLS_AES_128_GCM_SHA256:
+		return "TLS_AES_128_GCM_SHA256"
+	case tls.TLS_AES_256_GCM_SHA384:
+		return "TLS_AES_256_GCM_SHA384"
+	case tls.TLS_CHACHA20_POLY1305_SHA256:
+		return "TLS_CHACHA20_POLY1305_SHA256"
 	case tls.TLS_FALLBACK_SCSV:
 		return "TLS_FALLBACK_SCSV"
 	}
 
 	return "Unknown"
+}
+
+func TestTLSConfig(host string, port string, name string, tlsVersion uint16, cipherSuite uint16) bool {
+	tmpCS := []uint16{cipherSuite}
+
+	conf := &tls.Config{
+		// We're testing the configuration of the server here, not verifying the SSL certificate
+		InsecureSkipVerify: true,
+		MinVersion:         tlsVersion,
+		MaxVersion:         tlsVersion,
+		CipherSuites:       tmpCS,
+	}
+
+	if len(name) > 0 {
+		conf.ServerName = name
+	}
+
+	conn, err := tls.Dial("tcp", host+":"+port, conf)
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+
+	return true
 }
 
 // TLSVersionName returns the name of the TLS version
@@ -325,6 +306,8 @@ func TLSVersionName(version uint16) string {
 		return "TLS 1.1"
 	case tls.VersionTLS12:
 		return "TLS 1.2"
+	case tls.VersionTLS13:
+		return "TLS 1.3"
 	}
 
 	return "Unknown"
