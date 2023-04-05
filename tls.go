@@ -10,30 +10,6 @@ import (
 	"time"
 )
 
-func testTLSConfig(host string, port string, name string, tlsVersion uint16, cipherSuite uint16) bool {
-	tmpCS := []uint16{cipherSuite}
-
-	conf := &tls.Config{
-		// We're testing the configuration of the server here, not verifying the SSL certificate
-		InsecureSkipVerify: true,
-		MinVersion:         tlsVersion,
-		MaxVersion:         tlsVersion,
-		CipherSuites:       tmpCS,
-	}
-
-	if len(name) > 0 {
-		conf.ServerName = name
-	}
-
-	conn, err := tls.Dial("tcp", host+":"+port, conf)
-	if err != nil {
-		return false
-	}
-	defer conn.Close()
-
-	return true
-}
-
 // TLSConn is a struct for holding all the details
 // of a TLS connection.
 type TLSConn struct {
@@ -203,7 +179,7 @@ func (c *TLSConn) PrintConnectionStatus() {
 		fmt.Printf("%-40s", CipherSuiteName(cipherSuite))
 
 		for _, tlsVersion := range tlsVersions {
-			fmt.Printf(" %-7v", testTLSConfig(c.host, c.port, c.name, tlsVersion, cipherSuite))
+			fmt.Printf(" %-7v", TestTLSConfig(c.host, c.port, c.name, tlsVersion, cipherSuite))
 		}
 
 		fmt.Printf("\n")
@@ -284,6 +260,30 @@ func CipherSuiteName(suite uint16) string {
 	}
 
 	return "Unknown"
+}
+
+func TestTLSConfig(host string, port string, name string, tlsVersion uint16, cipherSuite uint16) bool {
+	tmpCS := []uint16{cipherSuite}
+
+	conf := &tls.Config{
+		// We're testing the configuration of the server here, not verifying the SSL certificate
+		InsecureSkipVerify: true,
+		MinVersion:         tlsVersion,
+		MaxVersion:         tlsVersion,
+		CipherSuites:       tmpCS,
+	}
+
+	if len(name) > 0 {
+		conf.ServerName = name
+	}
+
+	conn, err := tls.Dial("tcp", host+":"+port, conf)
+	if err != nil {
+		return false
+	}
+	defer conn.Close()
+
+	return true
 }
 
 // TLSVersionName returns the name of the TLS version
