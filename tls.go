@@ -20,6 +20,8 @@ func returnTLSVersion(version uint16) string {
 		return "TLS 1.1"
 	case tls.VersionTLS12:
 		return "TLS 1.2"
+	case tls.VersionTLS13:
+		return "TLS 1.3"
 	}
 
 	return "Unknown"
@@ -90,6 +92,7 @@ func NewTLSConn() TLSConn {
 		tls.VersionTLS10,
 		tls.VersionTLS11,
 		tls.VersionTLS12,
+		tls.VersionTLS13,
 	}
 
 	c.tlsCurves = []tls.CurveID{
@@ -143,6 +146,7 @@ func (c *TLSConn) PrintConnectionStatus() {
 		tls.VersionTLS10,
 		tls.VersionTLS11,
 		tls.VersionTLS12,
+		tls.VersionTLS13,
 	}
 
 	cipherSuites := [...]uint16{
@@ -325,6 +329,8 @@ func TLSVersionName(version uint16) string {
 		return "TLS 1.1"
 	case tls.VersionTLS12:
 		return "TLS 1.2"
+	case tls.VersionTLS13:
+		return "TLS 1.3"
 	}
 
 	return "Unknown"
