@@ -10,21 +10,6 @@ import (
 	"time"
 )
 
-func returnTLSCurve(curve tls.CurveID) string {
-	switch curve {
-	case tls.CurveP256:
-		return "P256"
-	case tls.CurveP384:
-		return "P384"
-	case tls.CurveP521:
-		return "P521"
-	case tls.X25519:
-		return "X25519"
-	}
-
-	return "Unknown"
-}
-
 func testTLSConfig(host string, port string, name string, tlsVersion uint16, cipherSuite uint16) bool {
 	tmpCS := []uint16{cipherSuite}
 
