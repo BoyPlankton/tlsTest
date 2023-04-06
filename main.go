@@ -15,10 +15,8 @@ func main() {
 
 	flag.Parse()
 
-	if *verify == true {
+	if *verify {
 		*verify = false
-	} else {
-		*verify = true
 	}
 
 	log.Printf("Host: %v, Port: %v, Verify: %v\n", *host, *port, *verify)

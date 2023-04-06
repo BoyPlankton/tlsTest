@@ -13,10 +13,9 @@ import (
 // TLSConn is a struct for holding all the details
 // of a TLS connection.
 type TLSConn struct {
-	host   string
-	port   string
-	name   string
-	verify bool
+	host string
+	port string
+	name string
 
 	conf *tls.Config
 
@@ -138,7 +137,7 @@ func (c *TLSConn) PrintConnectionStatus() {
 		PrintDetails("Valid From", cert.NotBefore.Format(time.RFC1123))
 		PrintDetails("Valid Until", fmt.Sprintf("%s (expires in %d days)",
 			cert.NotAfter.Format(time.RFC1123),
-			int(cert.NotAfter.Sub(time.Now()).Hours()/24)))
+			int(time.Until(cert.NotAfter).Hours()/24)))
 
 		PrintDetails("Key", PublicKeyDetails(cert))
 
