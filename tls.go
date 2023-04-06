@@ -137,7 +137,7 @@ func (c *TLSConn) PrintConnectionStatus() {
 		PrintDetails("Valid From", cert.NotBefore.Format(time.RFC1123))
 		PrintDetails("Valid Until", fmt.Sprintf("%s (expires in %d days)",
 			cert.NotAfter.Format(time.RFC1123),
-			int(cert.NotAfter.Sub(time.Now()).Hours()/24)))
+			int(time.Until(cert.NotAfter).Hours()/24)))
 
 		PrintDetails("Key", PublicKeyDetails(cert))
 
