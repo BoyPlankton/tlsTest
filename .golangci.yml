@@ -15,6 +15,7 @@ linters:
   option: value
 issues:
   exclude-rules:
+    # we want to ignore the warnings about SSL3 in tls.go
     - path: tls.go
       linters:
         - staticcheck
