@@ -14,9 +14,6 @@ linters:
   # See the dedicated "linters" documentation section.
   option: value
 issues:
-  # See the dedicated "issues" documentation section.
-  option: value
-issues:
   exclude-rules:
     - path: tls.go
       linters:
