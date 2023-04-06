@@ -13,10 +13,9 @@ import (
 // TLSConn is a struct for holding all the details
 // of a TLS connection.
 type TLSConn struct {
-	host   string
-	port   string
-	name   string
-	verify bool
+	host string
+	port string
+	name string
 
 	conf *tls.Config
 
