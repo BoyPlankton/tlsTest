@@ -2,36 +2,49 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"os"
 )
 
 func main() {
 	log.SetFlags(log.Lshortfile)
 
-	host := flag.String("host", "127.0.0.1", "Host")
-	port := flag.String("port", "443", "Port")
-	name := flag.String("name", "", "Server name to validate certificate with.")
-	verify := flag.Bool("verify", false, "Verify certificate.")
+	testCmd := flag.NewFlagSet("test", flag.ExitOnError)
+	testHost := testCmd.String("host", "127.0.0.1", "Host")
+	testPort := testCmd.String("port", "443", "Port")
+	testName := testCmd.String("name", "", "Server name to validate certificate with.")
+	testVerify := testCmd.Bool("verify", false, "Verify certificate.")
 
-	flag.Parse()
-
-	if *verify {
-		*verify = false
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: tlsTest test -host <hostname or ip>")
+		flag.PrintDefaults()
+		os.Exit(1)
 	}
 
-	log.Printf("Host: %v, Port: %v, Verify: %v\n", *host, *port, *verify)
+	switch os.Args[1] {
+	case "test":
+		testCmd.Parse(os.Args[2:])
+		if *testVerify {
+			*testVerify = false
+		}
 
-	tlsConn := NewTLSConn()
+		tlsConn := NewTLSConn()
 
-	tlsConn.SetHost(*host)
-	tlsConn.SetPort(*port)
-	tlsConn.SetName(*name)
-	tlsConn.SetVerify(*verify)
+		tlsConn.SetHost(*testHost)
+		tlsConn.SetPort(*testPort)
+		tlsConn.SetName(*testName)
+		tlsConn.SetVerify(*testVerify)
 
-	err := tlsConn.Dial()
-	if err != nil {
-		log.Print(err)
+		err := tlsConn.Dial()
+		if err != nil {
+			log.Print(err)
+		}
+
+		tlsConn.PrintConnectionStatus()
+	default:
+		fmt.Println("Usage: tlsTest test -host <hostname or ip>")
+		flag.PrintDefaults()
+		os.Exit(1)
 	}
-
-	tlsConn.PrintConnectionStatus()
 }
