@@ -24,7 +24,11 @@ func main() {
 
 	switch os.Args[1] {
 	case "test":
-		testCmd.Parse(os.Args[2:])
+		err := testCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Print(err)
+		}
+
 		if *testVerify {
 			*testVerify = false
 		}
@@ -36,7 +40,7 @@ func main() {
 		tlsConn.SetName(*testName)
 		tlsConn.SetVerify(*testVerify)
 
-		err := tlsConn.Dial()
+		err = tlsConn.Dial()
 		if err != nil {
 			log.Print(err)
 		}
