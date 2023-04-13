@@ -56,6 +56,17 @@ func main() {
 		}
 
 		tlsConn.PrintConnectionStatus()
+	case "cert":
+		switch os.Args[2] {
+		case "gen":
+			err := certGenerateCSRandKey()
+			if err != nil {
+				log.Print(err)
+			}
+		default:
+			fmt.Println("Usage: tlsTest cert gen <common name>")
+			os.Exit(1)
+		}
 	default:
 		fmt.Println("Usage: tlsTest test -host <hostname or ip>")
 		flag.PrintDefaults()
